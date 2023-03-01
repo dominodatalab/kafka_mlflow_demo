@@ -14,8 +14,13 @@ from sklearn.tree import DecisionTreeClassifier
 import pandas
 import pickle
 import time
+from pyparsing import *
 
 uuid=uuid.uuid1()
+
+
+
+is_canary_instance = os.environ.get('IS_CANARY','False').lower() in ('true', '1', 't')
 
 model_topic_name_prefix=os.environ['MODEL_TOPIC_NAME_PREFIX']
 inference_group_id = os.environ['INFERENCE_GROUP_ID']
@@ -23,23 +28,51 @@ inference_group_id = os.environ['INFERENCE_GROUP_ID']
 FEATURES_TOPIC=f'{model_topic_name_prefix}-features'
 PREDICTION_TOPIC=f'{model_topic_name_prefix}-predictions'
 MODEL_UPDATE_TOPIC=f'{model_topic_name_prefix}-updates'
+if is_canary_instance:
+    MODEL_UPDATE_TOPIC=f'{model_topic_name_prefix}-canary-updates'
 
 KAFKA_BOOTSTRAP_SERVERS = os.environ.get('KAFKA_BOOTSTRAP_SERVERS')
 KAFKA_USER_NAME = os.environ.get('KAFKA_USER_NAME')
 KAFKA_PASSWORD = os.environ.get('KAFKA_PASSWORD')
-
+KAFKA_FEATURES_TOPIC_PARTITION_RANGE = os.environ.get('KAFKA_FEATURES_TOPIC_PARTITION_RANGE')
 
 import uuid
-uuid=uuid.uuid1()
-group_id = f'grp-{uuid}'
 import time
 import os
 from confluent_kafka import TopicPartition,Producer,Consumer
 import certifi
 import threading
 
+uuid=uuid.uuid1()
+group_id = f'grp-{uuid}'
+
 latest_version=-1
 models = {}
+
+
+
+def return_range(strg, loc, toks):
+    if len(toks)==1:
+        return int(toks[0])
+    else:
+        return range(int(toks[0]), int(toks[1])+1)
+def get_partition_list(s):
+    expr = Forward()
+    term = (Word(nums) + Optional(Literal('-').suppress() + Word(nums))).setParseAction(return_range)
+    expr << term + Optional(Literal(',').suppress() + expr)
+    lst =  expr.parseString(s, parseAll=True)
+    new_lst = []
+    for i in lst:
+        if isinstance(i,range):
+            for x in i:
+                new_lst.append(x)
+        else:
+            new_lst.append(i)
+    return new_lst
+
+features_topic_partition_list = get_partition_list(KAFKA_FEATURES_TOPIC_PARTITION_RANGE)
+
+
 
 def get_latest_model(group_id): 
     global latest_version    
@@ -99,10 +132,8 @@ def consume_features(group_id:str):
     print('Initialized')
     #latest_version = max(list(models.keys()))
     features_tls = []
-    features_tls.append(TopicPartition(FEATURES_TOPIC, 0))
-    features_tls.append(TopicPartition(FEATURES_TOPIC, 1))
-    features_tls.append(TopicPartition(FEATURES_TOPIC, 2))
-    features_tls.append(TopicPartition(FEATURES_TOPIC, 3))
+    for p in features_topic_partition_list:
+        features_tls.append(TopicPartition(FEATURES_TOPIC, p))
 
     #Only one model instance recieves the message (Each has the SAME consumer group)
     features_consumer_conf = {'bootstrap.servers': KAFKA_BOOTSTRAP_SERVERS,
