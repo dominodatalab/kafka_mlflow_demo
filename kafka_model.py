@@ -165,10 +165,10 @@ def consume_features(group_id:str):
             features_json = json.loads(msg.value().decode("utf-8"))        
             y_hat = models[latest_version].predict([features_json['X']])[0]
             features_consumer.commit()
-            
-            features_json['FEATURE_INDEX']=str(features_json['index'])
-            features_json['MODEL_VERSION']=str(latest_version)
-            features_json['Y_HAT']=str(y_hat)
+            prediction_json['CONSUMER_GROUP']=inference_group_id
+            prediction_json['FEATURE_INDEX']=str(features_json['index'])
+            prediction_json['MODEL_VERSION']=str(latest_version)
+            prediction_json['Y_HAT']=str(y_hat)
             p_record = json.dumps(features_json).encode('utf-8')
             predictions_producer.produce(PREDICTION_TOPIC, value=p_record, key=msg.key())
             predictions_producer.flush()
