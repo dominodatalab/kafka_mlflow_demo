@@ -145,7 +145,8 @@ def consume_features(group_id:str):
                      'enable.auto.commit': True,
                      'auto.offset.reset': 'latest'}
     features_consumer = Consumer(features_consumer_conf)    
-    features_consumer.assign(features_tls)    
+    #features_consumer.assign(features_tls)    
+    features_consumer.subscribe([FEATURES_TOPIC])
 
     client_id='client-1'
     producer_conf = {'bootstrap.servers': KAFKA_BOOTSTRAP_SERVERS,
