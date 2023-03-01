@@ -28,8 +28,6 @@ inference_group_id = os.environ['INFERENCE_GROUP_ID']
 FEATURES_TOPIC=f'{model_topic_name_prefix}-features'
 PREDICTION_TOPIC=f'{model_topic_name_prefix}-predictions'
 MODEL_UPDATE_TOPIC=f'{model_topic_name_prefix}-updates'
-if is_canary_instance:
-    MODEL_UPDATE_TOPIC=f'{model_topic_name_prefix}-canary-updates'
 
 KAFKA_BOOTSTRAP_SERVERS = os.environ.get('KAFKA_BOOTSTRAP_SERVERS')
 KAFKA_USER_NAME = os.environ.get('KAFKA_USER_NAME')
@@ -105,6 +103,7 @@ def get_latest_model(group_id):
                 elif msg.error():
                     sys.stderr.write(f'Error code{msg.error().code()} \n')
             else:
+                
                 model_json = json.loads(msg.value().decode("utf-8"))
                 picked_str=model_json['model']
                 model_instance = pickle.loads(codecs.decode(model_json['model'].encode(), "base64"))
