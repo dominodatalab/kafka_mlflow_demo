@@ -123,6 +123,7 @@ def get_latest_model(group_id):
 
 
 def consume_features(group_id:str):  
+    global latest_version
     print(models)
     print(latest_version)
     if(latest_version<0):
@@ -161,9 +162,12 @@ def consume_features(group_id:str):
     msg = None
     msg = features_consumer.poll(1)    
     while(True):
-        if msg:            
+        if msg:   
+            
             features_json = json.loads(msg.value().decode("utf-8"))        
             features_json = json.loads(msg.value().decode("utf-8"))        
+            latest_version = max(list(models.keys()))
+            print(f'model latest version {latest_version}')
             y_hat = models[latest_version].predict([features_json['X']])[0]
             features_consumer.commit()
             features_json['CONSUMER_GROUP']=inference_group_id
