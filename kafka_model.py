@@ -129,9 +129,9 @@ def consume_features(group_id:str):
         time.sleep(10)
     print('Initialized')
     #latest_version = max(list(models.keys()))
-    features_tls = []
-    for p in features_topic_partition_list:
-        features_tls.append(TopicPartition(FEATURES_TOPIC, p))
+    #features_tls = []
+    #for p in features_topic_partition_list:
+    #    features_tls.append(TopicPartition(FEATURES_TOPIC, p))
 
     #Only one model instance recieves the message (Each has the SAME consumer group)
     features_consumer_conf = {'bootstrap.servers': KAFKA_BOOTSTRAP_SERVERS,
