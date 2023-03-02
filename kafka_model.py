@@ -27,7 +27,7 @@ inference_group_id = os.environ['INFERENCE_GROUP_ID']
 
 FEATURES_TOPIC=f'{model_topic_name_prefix}-features'
 PREDICTION_TOPIC=f'{model_topic_name_prefix}-predictions'
-MODEL_UPDATE_TOPIC=f'{model_topic_name_prefix}-updates'
+MODEL_UPDATE_TOPIC=f'{model_topic_name_prefix}-model-publish'
 
 KAFKA_BOOTSTRAP_SERVERS = os.environ.get('KAFKA_BOOTSTRAP_SERVERS')
 KAFKA_USER_NAME = os.environ.get('KAFKA_USER_NAME')
