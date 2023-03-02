@@ -84,11 +84,11 @@ def get_latest_model(group_id):
                      'group.id': group_id,
                      'enable.auto.commit': False,
                      'auto.offset.reset': 'earliest'}
-    model_updates_tls = []
-    model_updates_tls.append(TopicPartition(MODEL_UPDATE_TOPIC, 0))
+    #model_updates_tls = []
+    #model_updates_tls.append(TopicPartition(MODEL_UPDATE_TOPIC, 0))
 
     model_update_consumer = Consumer(model_update_consumer_conf)
-    model_update_consumer.assign(model_updates_tls)    
+    model_update_consumer.subscribe([MODEL_UPDATE_TOPIC])    
     msg = model_update_consumer.poll(timeout=1.0)
     if not msg:
         msg = model_update_consumer.poll(timeout=1.0)    
