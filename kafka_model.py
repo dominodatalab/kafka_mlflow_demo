@@ -18,8 +18,6 @@ from pyparsing import *
 
 uuid=uuid.uuid1()
 
-
-
 is_canary_instance = os.environ.get('IS_CANARY','False').lower() in ('true', '1', 't')
 
 model_topic_name_prefix=os.environ['MODEL_TOPIC_NAME_PREFIX']
@@ -32,7 +30,7 @@ MODEL_UPDATE_TOPIC=f'{model_topic_name_prefix}-model-publish'
 KAFKA_BOOTSTRAP_SERVERS = os.environ.get('KAFKA_BOOTSTRAP_SERVERS')
 KAFKA_USER_NAME = os.environ.get('KAFKA_USER_NAME')
 KAFKA_PASSWORD = os.environ.get('KAFKA_PASSWORD')
-KAFKA_FEATURES_TOPIC_PARTITION_RANGE = os.environ.get('KAFKA_FEATURES_TOPIC_PARTITION_RANGE')
+#KAFKA_FEATURES_TOPIC_PARTITION_RANGE = os.environ.get('KAFKA_FEATURES_TOPIC_PARTITION_RANGE')
 
 import uuid
 import time
@@ -68,7 +66,7 @@ def get_partition_list(s):
             new_lst.append(i)
     return new_lst
 
-features_topic_partition_list = get_partition_list(KAFKA_FEATURES_TOPIC_PARTITION_RANGE)
+#features_topic_partition_list = get_partition_list(KAFKA_FEATURES_TOPIC_PARTITION_RANGE)
 
 
 
